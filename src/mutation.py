@@ -45,7 +45,7 @@ class Mutate:
             row["Source Code"] = file
             df.append(row)
         self.df = pd.DataFrame(df, columns = ["Source Code"]+self.tests)
-        self.df.to_csv("./output/" + self.path.split('/')[-1]+".csv", index=False)
+        self.df.to_csv("../output/" + self.path.split('/')[-1]+".csv", index=False)
         return self.df
 
 
@@ -55,10 +55,7 @@ class Mutate:
 
 
 if __name__ == "__main__":
-    try:
-        path = sys.argv[1]
-    except:
-        path = '.'
+    path = sys.argv[1]
     runner = Mutate(path)
     df = runner.mutation_test()
     print(df)
