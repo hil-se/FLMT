@@ -45,6 +45,7 @@ class Mutate:
             row["Source Code"] = file
             df.append(row)
         self.df = pd.DataFrame(df, columns = ["Source Code"]+self.tests)
+        self.df.to_csv("./output/" + self.path.split('/')[-1]+".csv", index=False)
         return self.df
 
 
