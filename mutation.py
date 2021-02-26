@@ -1,9 +1,8 @@
 import os
 import sys
-from io import StringIO
 import pandas as pd
-from shutil import rmtree
 from pdb import set_trace
+import subprocess
 
 class Mutate:
 
@@ -50,30 +49,8 @@ class Mutate:
 
 
     def test(self):
-        if "pytest" in sys.modules:
-            sys.modules.pop("pytest")
-        import pytest
-        original_output = sys.stdout
-        sys.stdout = StringIO()
-        set_trace()
-        exit_code = pytest.main(['-rfEpP', '--rootdir='+self.path, self.path])
-        output = sys.stdout.getvalue()
-        sys.stdout.close()
-        sys.stdout = original_output
-        print(output)
-        result = []
-        for line in output.split('\n'):
-            break_line = line.split()
-            if break_line and (break_line[0] == "FAILED" or break_line[0] == "ERROR"):
-                result.append(os.path.realpath(break_line[1].split("::")[0]))
-
-        rmtree(os.path.join(self.path, ".pytest_cache"))
-        for root, dirs, files in os.walk(self.path):
-            for dir in dirs:
-                if dir == "__pycache__":
-                    rmtree(os.path.join(root, dir))
-
-        return set(result)
+        result = subprocess.run([sys.executable, "./single_pytest.py", self.path], capture_output=True, text=True)
+        return set(result.stdout.split())
 
 
 if __name__ == "__main__":
