@@ -9,6 +9,7 @@ class Mutate:
     def __init__(self, path):
         if os.path.exists(path):
             self.path = os.path.realpath(path)
+            self.name = self.path.split("/")[-1]
         else:
             raise Exception("Input Path Does Not Exist.")
         self.mutated = None
@@ -34,6 +35,7 @@ class Mutate:
                     else:
                         self.codes.append(full_path)
 
+
     def mutation_test(self):
         self.find_all_files()
         df = []
@@ -41,10 +43,10 @@ class Mutate:
             self.mutate(file)
             result = self.test()
             self.recover()
-            row = {test: 1 if test in result else 0 for test in self.tests}
-            row["Source Code"] = file
+            row = {self.name.join(test.split(self.name)[1:])[1:]: 1 if test in result else 0 for test in self.tests}
+            row["Source Code"] = self.name.join(file.split(self.name)[1:])[1:]
             df.append(row)
-        self.df = pd.DataFrame(df, columns = ["Source Code"]+self.tests)
+        self.df = pd.DataFrame(df, columns = ["Source Code"]+[self.name.join(test.split(self.name)[1:])[1:] for test in self.tests])
         self.df.to_csv("../output/" + self.path.split('/')[-1]+".csv", index=False)
         return self.df
 
